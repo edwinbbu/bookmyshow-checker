@@ -15,6 +15,14 @@ const USER_AGENT =
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Local-time timestamp like "2026-05-21 13:05:42" — prefixed on every log line.
+const ts = () => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+const log = (...args) => console.log(`[${ts()}]`, ...args);
+
 // Produces "Sat23May" — the text BMS renders inside each date pill on the strip.
 const pillTextForDate = (yyyymmdd) => {
     const y = Number(yyyymmdd.slice(0, 4));
@@ -31,10 +39,10 @@ const TARGET_PILL_TEXT = pillTextForDate(TARGET_DATE);
 const checkOnce = async (context) => {
     const page = await context.newPage();
     try {
-        console.log(`Checking ${TARGET_DATE} (${TARGET_PILL_TEXT})…`);
+        log(`Checking ${TARGET_DATE} (${TARGET_PILL_TEXT})…`);
         const resp = await page.goto(VENUE_URL, { waitUntil: 'domcontentloaded', timeout: 30_000 });
         if (!resp) {
-            console.log('  no response, will retry');
+            log('  no response, will retry');
             return false;
         }
 
@@ -59,13 +67,13 @@ const checkOnce = async (context) => {
 
         const pillEnabled = pillState.found && pillState.opacity >= 0.95;
 
-        console.log(`  finalUrl=${finalUrl}`);
-        console.log(`  urlOnTargetDate=${urlMatches}  pill.found=${pillState.found}  pill.opacity=${pillState.opacity ?? 'n/a'}`);
+        log(`  finalUrl=${finalUrl}`);
+        log(`  urlOnTargetDate=${urlMatches}  pill.found=${pillState.found}  pill.opacity=${pillState.opacity ?? 'n/a'}`);
 
         // Bookings are considered open when the URL didn't bounce AND the pill renders enabled.
         return urlMatches && pillEnabled;
     } catch (err) {
-        console.log(`  request failed: ${err.message}. Will retry.`);
+        log(`  request failed: ${err.message}. Will retry.`);
         return false;
     } finally {
         await page.close();
@@ -83,12 +91,12 @@ const main = async () => {
     try {
         while (true) {
             if (await checkOnce(context)) {
-                console.log(`\nBookings OPEN for ${TARGET_DATE} at ${VENUE_SLUG}. Opening browser.`);
+                log(`Bookings OPEN for ${TARGET_DATE} at ${VENUE_SLUG}. Opening browser.`);
                 open(VENUE_URL);
                 await sleep(500);
                 break;
             }
-            console.log(`  not yet. Sleeping ${POLL_INTERVAL_MS / 60_000} min.\n`);
+            log(`  not yet. Sleeping ${POLL_INTERVAL_MS / 60_000} min.\n`);
             await sleep(POLL_INTERVAL_MS);
         }
     } finally {
