@@ -99,23 +99,24 @@ ps -p $(cat checker.pid)
 
 ## Output
 
+Every log line is prefixed with a local-time timestamp (`YYYY-MM-DD HH:mm:ss`).
+
 While waiting:
 
 ```
-Checking 20260523 (Sat23May)…
-  finalUrl=https://in.bookmyshow.com/cinemas/kochi/.../buytickets/VMHE/20260521
-  urlOnTargetDate=false  pill.found=true  pill.opacity=0.4
-  not yet. Sleeping 40 min.
+[2026-05-21 13:05:42] Checking 20260523 (Sat23May)…
+[2026-05-21 13:05:48]   finalUrl=https://in.bookmyshow.com/cinemas/kochi/.../buytickets/VMHE/20260521
+[2026-05-21 13:05:48]   urlOnTargetDate=false  pill.found=true  pill.opacity=0.4
+[2026-05-21 13:05:48]   not yet. Sleeping 40 min.
 ```
 
 When the date opens:
 
 ```
-Checking 20260523 (Sat23May)…
-  finalUrl=https://in.bookmyshow.com/cinemas/kochi/.../buytickets/VMHE/20260523
-  urlOnTargetDate=true  pill.found=true  pill.opacity=1
-
-Bookings OPEN for 20260523 at vanitha-cineplex-rgb-laser-4k-3d-atmos-edappally. Opening browser.
+[2026-05-22 09:12:03] Checking 20260523 (Sat23May)…
+[2026-05-22 09:12:10]   finalUrl=https://in.bookmyshow.com/cinemas/kochi/.../buytickets/VMHE/20260523
+[2026-05-22 09:12:10]   urlOnTargetDate=true  pill.found=true  pill.opacity=1
+[2026-05-22 09:12:10] Bookings OPEN for 20260523 at vanitha-cineplex-rgb-laser-4k-3d-atmos-edappally. Opening browser.
 ```
 
 …and the buytickets page auto-opens in your default browser. The script then exits cleanly.
